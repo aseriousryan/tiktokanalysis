@@ -1,72 +1,95 @@
 <template>
-  <v-conatiner>
-    <v-row>
-      <v-col>
-        <v-card class="mx-auto" max-width="368">
-          <v-card-item title="Florida">
-            <template v-slot:subtitle>
-              <v-icon icon="mdi-alert" size="18" color="error" class="me-1 pb-1"></v-icon>
+  <v-app>
+    <v-navigation-drawer app v-model="drawer"
+        class="bg-deep-purple"
+        theme="dark"
+        permanent
+      >
+        <v-list color="transparent">
+          <v-list-item prepend-icon="mdi-view-dashboard" title="Dashboard"></v-list-item>
+          <v-list-item prepend-icon="mdi-account-box" title="Account"></v-list-item>
+          <v-list-item prepend-icon="mdi-gavel" title="Admin"></v-list-item>
+        </v-list>
 
-              Extreme Weather Alert
-            </template>
-          </v-card-item>
-
-          <v-card-text class="py-0">
-            <v-row align="center" no-gutters>
-              <v-col class="text-h2" cols="6">
-                64&deg;F
-              </v-col>
-
-              <v-col cols="6" class="text-right">
-                <v-icon color="error" icon="mdi-weather-hurricane" size="88"></v-icon>
-              </v-col>
-            </v-row>
-          </v-card-text>
-
-          <div class="d-flex py-3 justify-space-between">
-            <v-list-item density="compact" prepend-icon="mdi-weather-windy">
-              <v-list-item-subtitle>123 km/h</v-list-item-subtitle>
-            </v-list-item>
-
-            <v-list-item density="compact" prepend-icon="mdi-weather-pouring">
-              <v-list-item-subtitle>48%</v-list-item-subtitle>
-            </v-list-item>
-          </div>
-
-          <v-expand-transition>
-            <div v-if="expand">
-              <div class="py-2">
-                <v-slider v-model="time" :max="6" :step="1" :ticks="labels" class="mx-4" color="primary" density="compact"
-                  hide-details show-ticks="always" thumb-size="10"></v-slider>
-              </div>
-
-              <v-list class="bg-transparent">
-                <v-list-item v-for="item in forecast" :key="item.day" :title="item.day" :append-icon="item.icon"
-                  :subtitle="item.temp">
-                </v-list-item>
-              </v-list>
-            </div>
-          </v-expand-transition>
-
-          <v-divider></v-divider>
-
-          <v-card-actions>
-            <v-btn @click="expand = !expand">
-              {{ !expand ? 'Full Report' : 'Hide Report' }}
+        <template v-slot:append>
+          <div class="pa-2">
+            <v-btn block>
+              Logout
             </v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-col>
-    </v-row>
-  </v-conatiner>
+          </div>
+        </template>
+      </v-navigation-drawer>
+
+    <v-app-bar app>
+      <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
+      <v-toolbar-title>Demo Dashboard</v-toolbar-title>
+    </v-app-bar>
+
+    <v-main>
+      <v-container fluid>
+        <v-row>
+          <v-col cols="12">
+            <v-card>
+              <v-card-title>Table</v-card-title>
+              <v-card-text>
+                <v-data-table
+                  :headers="headers"
+                  :items="plants"
+                  item-key="name"
+                ></v-data-table>
+              </v-card-text>
+              {{ test }}
+            </v-card>
+          </v-col>
+        </v-row>
+      </v-container>
+    </v-main>
+  </v-app>
 </template>
 
 <script>
-// import HelloWorld from '@/components/HelloWorld.vue'
+import axios from 'axios';
+
 export default {
-  name: 'HelloWorld',
-  props: {
-    msg: String
+  data: () => ({
+    drawer: null,
+    items: [
+      { title: 'Home', icon: 'mdi-home' },
+      { title: 'About', icon: 'mdi-help-box' },
+    ],
+    headers: [
+      { title: 'URL', align: 'start', sortable: false, key: 'url' },
+      { title: 'Likes', align: 'end', key: 'likes' },
+      { title: 'Comment', align: 'end', key: 'comment' },
+      { title: 'Bookmark', align: 'end', key: 'bookmark' },
+      { title: 'Share', align: 'end', key: 'share' },
+    ],
+    plants: [],
+    test:"",
+  }),
+  created() {
+    this.property = 'Example property update.'
+    this.pulldata();
+
+    },
+  methods:{
+     async pulldata() {
+      console.log('propertyComputed will update, as this.property is now reactive.')
+      const response = await axios.get('http://localhost:3001/scrape');
+      // console.log(response.data);
+      this.plants = response.data;
+      this.plants = [
+        {
+          url: 'https://www.tiktok.com/@drbotak.goh/video/7042086099157617947',
+          likes: '90',
+          comment: '17',
+          bookmark: '0',
+          share: '4'
+        },
+      ]
+      console.log(this.plants)
+      this.test = "dsadsa"
+    }
   }
 }
 </script>
